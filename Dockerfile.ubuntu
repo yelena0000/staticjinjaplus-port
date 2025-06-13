@@ -1,0 +1,16 @@
+FROM ubuntu:24.04
+
+ARG VERSION
+ARG CHECKSUM
+
+WORKDIR /app
+
+ADD --checksum=sha256:${CHECKSUM} https://github.com/MrDave/StaticJinjaPlus/archive/${VERSION}.tar.gz /tmp/app.tar.gz
+RUN tar xzf /tmp/app.tar.gz --strip-components=1 -C /app && rm /tmp/app.tar.gz
+
+RUN apt update && apt install -y python3 python3-pip && apt clean && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir --break-system-packages -r /app/requirements.txt
+
+ENTRYPOINT ["python3", "main.py"]
+CMD ["--srcpath", "/app/templates", "--outpath", "/app/output"]
