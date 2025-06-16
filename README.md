@@ -56,22 +56,23 @@ rm *.tar.gz
 ```
 Примечание: Хэш может меняться при обновлении репозитория. Всегда проверяйте его перед сборкой.
 ### 3. Сборка образа
-Укажите версию StaticJinjaPlus (тег `0.1.0`, `0.1.1` или `main`) и вычисленную в предыдущих шагах контрольную сумму (`CHECKSUM`).
+Укажите версию (`VERSION`) StaticJinjaPlus и вычисленную в предыдущих шагах контрольную сумму (`CHECKSUM`).
 Выберите соответствующий Dockerfile в зависимости от базового образа.
+
+Допустимые значения для `VERSION`:
+- тег `0.1.0`: `VERSION=tags/0.1.0`
+- тег `0.1.1`: `VERSION=tags/0.1.1`
+- ветка `main`: `VERSION=heads/main`
 
 #### Пример сборки с базовым образом Ubuntu (версия 0.1.0)
 ```bash
-docker build --platform linux/amd64 -f Dockerfile.ubuntu -t yourusername/static-jinja-plus:0.1.0 --build-arg VERSION=0.1.0 --build-arg CHECKSUM=3555bcfd670e134e8360ad934cb5bad1bbe2a7dad24ba7cafa0a3bb8b23c6444 .
+docker build --platform linux/amd64 -f Dockerfile.ubuntu -t yourusername/static-jinja-plus:0.1.0 --build-arg VERSION=tags/0.1.0 --build-arg CHECKSUM=3555bcfd670e134e8360ad934cb5bad1bbe2a7dad24ba7cafa0a3bb8b23c6444 .
 ```
 #### Пример сборки с базовым образом Python Slim (ветка develop)
 ```bash
-docker build --platform linux/amd64 -f Dockerfile.python-slim -t yourusername/static-jinja-plus:develop --build-arg VERSION=main --build-arg CHECKSUM=9adccb8fe17a40252df1a3acdea7edef4633b4ecaa8ba2dd5e0270f87ae43eab .
+docker build --platform linux/amd64 -f Dockerfile.python-slim -t yourusername/static-jinja-plus:develop --build-arg VERSION=heads/main --build-arg CHECKSUM=9adccb8fe17a40252df1a3acdea7edef4633b4ecaa8ba2dd5e0270f87ae43eab .
 ```
-#### Примечание:
 
-- Для тегов (`0.1.0`, `0.1.1`) используйте значение VERSION как есть (без refs/tags/), например: `VERSION=0.1.0`.
-- Для ветки `main` используйте `VERSION=main`.
-  
 ### 4. Публикация на Docker Hub
 ```bash
 docker login
