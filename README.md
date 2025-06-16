@@ -17,9 +17,47 @@
 git clone https://github.com/yelena0000/staticjinjaplus-port.git
 cd staticjinjaplus-port
 ```
-### 2. Сборка образа
-- Укажите версию StaticJinjaPlus (например, тег, ветку или хэш коммита) и контрольную сумму (checksum).
-- Используйте соответствующий Dockerfile в зависимости от базового образа.
+### 2. Получение контрольной суммы (SHA256)
+Контрольная сумма (SHA256-хэш) необходима для проверки целостности загружаемого архива StaticJinjaPlus. Выполните следующие шаги для её вычисления:
+
+1. Скачайте архив с нужной версией или веткой:
+   
+Для тега `0.1.0`:
+```bash
+wget https://github.com/MrDave/StaticJinjaPlus/archive/refs/tags/0.1.0.tar.gz
+```
+Для тега `0.1.1`:
+```bash
+wget https://github.com/MrDave/StaticJinjaPlus/archive/refs/tags/0.1.1.tar.gz
+```
+Для ветки `main` (для тега `develop`):
+```bash
+wget https://github.com/MrDave/StaticJinjaPlus/archive/refs/heads/main.tar.gz
+```
+
+2. Вычислите SHA256-хэш:
+Используйте команду `sha256sum`:
+```bash
+sha256sum 0.1.0.tar.gz
+````
+```bash
+sha256sum 0.1.1.tar.gz
+````
+```bash
+sha256sum main.tar.gz
+```
+Пример результата для `0.1.0.tar.gz`: `3555bcfd670e134e8360ad934cb5bad1bbe2a7dad24ba7cafa0a3bb8b23c6444`.
+
+3. Скопируйте полученный хэш (первые 64 символа) для использования в команде сборки (необходимо будет подставить это значение после `CHECKSUM=`).
+
+4. Удалите временный файл (опционально):
+```bash
+rm *.tar.gz
+```
+Примечание: Хэш может меняться при обновлении репозитория. Всегда проверяйте его перед сборкой.
+### 3. Сборка образа
+Укажите версию StaticJinjaPlus (тег `0.1.0`, `0.1.1` или `main`) и вычисленную в предыдущих шагах контрольную сумму (`CHECKSUM`).
+Выберите соответствующий Dockerfile в зависимости от базового образа.
 
 #### Пример сборки с базовым образом Ubuntu (версия 0.1.0)
 ```bash
@@ -27,20 +65,20 @@ docker build --platform linux/amd64 -f Dockerfile.ubuntu -t yourusername/static-
 ```
 #### Пример сборки с базовым образом Python Slim (ветка develop)
 ```bash
-docker build --platform linux/amd64 -f Dockerfile.python-slim -t yourusername/static-jinja-plus:develop --build-arg VERSION=refs/heads/main --build-arg CHECKSUM=9adccb8fe17a40252df1a3acdea7edef4633b4ecaa8ba2dd5e0270f87ae43eab .
+docker build --platform linux/amd64 -f Dockerfile.python-slim -t yourusername/static-jinja-plus:develop --build-arg VERSION=main --build-arg CHECKSUM=9adccb8fe17a40252df1a3acdea7edef4633b4ecaa8ba2dd5e0270f87ae43eab .
 ```
-### 3. Публикация на Docker Hub
+#### Примечание:
+
+- Для тегов (`0.1.0`, `0.1.1`) используйте значение VERSION как есть (без refs/tags/), например: `VERSION=0.1.0`.
+- Для ветки `main` используйте `VERSION=main`.
+  
+### 4. Публикация на Docker Hub
 ```bash
 docker login
 docker push yourusername/static-jinja-plus:0.1.0
 ```
+Аналогично повторите для других тегов (`0.1.1`, `latest`, `develop`, `0.1.0-slim`, `0.1.1-slim`, `slim`, `develop-slim`).
 ### Примечания
-- Замените `yourusername` на ваш логин на `Docker Hub`.
-- Контрольные суммы (checksum) можно вычислить с помощью команды `sha256sum` после скачивания файла `.tar.gz` из репозитория `StaticJinjaPlus` на `GitHub`.
-- Для использования последней версии укажите ветку `main` или конкретный хэш коммита.
-- Сравните размеры образов: Ubuntu (~175 МБ) больше, чем Python Slim (~52 МБ), что важно для оптимизации скачивания.
-
-### Примеры версий
-- `0.1.0`: Стабильная версия, контрольная сумма 3555bcfd670e134e8360ad934cb5bad1bbe2a7dad24ba7cafa0a3bb8b23c6444
-- `0.1.1`: Обновлённая версия, контрольная сумма 30d9424df1eddb73912b0e2ad5375fa2c876c8e30906bec91952dfb75dcf220b
-- `develop`: Разрабатываемая ветка, контрольная сумма 9adccb8fe17a40252df1a3acdea7edef4633b4ecaa8ba2dd5e0270f87ae43eab
+- Замените `yourusername` на ваш логин на Docker Hub.
+- Контрольные суммы можно обновлять при изменении репозитория, повторяя шаги из раздела "Получение контрольной суммы".
+- Размеры образов: Ubuntu (~175 МБ) больше, чем Python Slim (~52 МБ), что важно для оптимизации.
