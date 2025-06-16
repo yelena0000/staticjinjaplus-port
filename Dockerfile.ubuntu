@@ -5,11 +5,7 @@ ARG CHECKSUM
 
 WORKDIR /app
 
-RUN if [ "$VERSION" = "main" ]; then \
-      ADD --checksum=sha256:${CHECKSUM} https://github.com/MrDave/StaticJinjaPlus/archive/refs/heads/${VERSION}.tar.gz /tmp/app.tar.gz; \
-    else \
-      ADD --checksum=sha256:${CHECKSUM} https://github.com/MrDave/StaticJinjaPlus/archive/refs/tags/${VERSION}.tar.gz /tmp/app.tar.gz; \
-    fi
+ADD --checksum=sha256:${CHECKSUM} https://github.com/MrDave/StaticJinjaPlus/archive/refs/${VERSION}.tar.gz /tmp/app.tar.gz
 
 RUN tar xzf /tmp/app.tar.gz --strip-components=1 -C /app && rm /tmp/app.tar.gz
 
