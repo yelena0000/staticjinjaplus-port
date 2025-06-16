@@ -5,11 +5,16 @@ ARG CHECKSUM
 
 WORKDIR /app
 
-ADD --checksum=sha256:${CHECKSUM} https://github.com/MrDave/StaticJinjaPlus/archive/refs/${VERSION}.tar.gz /tmp/app.tar.gz
-
-RUN tar xzf /tmp/app.tar.gz --strip-components=1 -C /app && rm /tmp/app.tar.gz
+RUN apt-get update && apt-get install -y curl coreutils && \
+    curl -L -o /tmp/app.tar.gz https://github.com/MrDave/StaticJinjaPlus/archive/refs/${VERSION}.tar.gz && \
+    echo "${CHECKSUM}  /tmp/app.tar.gz" | sha256sum -c - && \
+    tar xzf /tmp/app.tar.gz --strip-components=1 -C /app && \
+    rm /tmp/app.tar.gz && \
+    apt-get purge -y curl coreutils && apt-get autoremove -y && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir --break-system-packages -r /app/requirements.txt
 
 ENTRYPOINT ["python3", "main.py"]
 CMD ["--srcpath", "/app/templates", "--outpath", "/app/output"]
+
